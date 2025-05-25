@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>한자 퀴즈</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #fdf6e3;
+      padding: 20px;
+      text-align: center;
+    }
+    .quiz-box {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 30px;
+    }
+    .question {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1.1rem;
+      background-color: #ffeaa7;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .options button:hover {
+      background-color: #fab1a0;
+    }
+    #result {
+      display: none;
+      margin-top: 20px;
+      font-size: 1.4rem;
+    }
+    .result-box {
+      margin-top: 30px;
+      padding: 20px;
+      background-color: #dfe6e9;
+      border-radius: 15px;
+    }
+    .emoji {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-box">
+    <div class="question" id="question">문제를 불러오는 중...</div>
+    <div class="options" id="options"></div>
+    <div id="result"></div>
+  </div>
+
+  <div class="result-box" id="finalResult" style="display: none;">
+    <div class="emoji">🎉</div>
+    <div id="scoreMessage"></div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: '信의 뜻은 무엇인가요?',
+        options: ['믿을 신', '편지 신', '길 신', '소리 신'],
+        answer: '믿을 신'
+      },
+      {
+        question: '四面八達에서 面의 뜻은?',
+        options: ['얼굴', '방향', '넓이', '사람'],
+        answer: '방향'
+      },
+      {
+        question: '開의 반대 한자는?',
+        options: ['發', '放', '閉', '開'],
+        answer: '閉'
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const resultEl = document.getElementById('result');
+    const finalResultEl = document.getElementById('finalResult');
+    const scoreMessageEl = document.getElementById('scoreMessage');
+
+    function loadQuiz() {
+      const q = quizData[current];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = '';
+      q.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option;
+        btn.onclick = () => checkAnswer(option);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected) {
+      if (selected === quizData[current].answer) {
+        resultEl.textContent = '정답입니다! 😊';
+        score++;
+      } else {
+        resultEl.textContent = `틀렸어요! 😢 정답: ${quizData[current].answer}`;
+      }
+      resultEl.style.display = 'block';
+      setTimeout(() => {
+        resultEl.style.display = 'none';
+        current++;
+        if (current < quizData.length) {
+          loadQuiz();
+        } else {
+          showFinalResult();
+        }
+      }, 1500);
+    }
+
+    function showFinalResult() {
+      document.querySelector('.quiz-box').style.display = 'none';
+      finalResultEl.style.display = 'block';
+      let msg = `당신의 점수는 ${score} / ${quizData.length} 입니다.`;
+      if (score === quizData.length) msg += ' 최고예요! 🌟';
+      else if (score >= 2) msg += ' 잘했어요! 👍';
+      else msg += ' 조금 더 연습해볼까요? 🐣';
+      scoreMessageEl.textContent = msg;
+    }
+
+    loadQuiz();
+  </script>
+</body>
+</html>
