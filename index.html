@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Teachable Machine 테스트</title>
 </head>
 <body>
@@ -10,13 +10,12 @@
   <div id="webcam-container"></div>
   <div id="label-container"></div>
 
-  <!-- Teachable Machine 라이브러리 -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
+  <!-- ✅ 필수: Teachable Machine과 TensorFlow.js 순서 주의! -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.4/dist/teachablemachine-image.min.js"></script>
 
   <script type="text/javascript">
     const URL = "https://teachablemachine.withgoogle.com/models/NIqkvtYy4/";
-
     let model, webcam, labelContainer, maxPredictions;
 
     async function init() {
@@ -24,25 +23,23 @@
       const metadataURL = URL + "metadata.json";
 
       try {
-        // 모델 불러오기
+        // ✅ tmImage는 teachablemachine-image 라이브러리 안에 정의됨
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        // 웹캠 설정
-        webcam = new tmImage.Webcam(200, 200, true); // flip = true
-        await webcam.setup(); // 카메라 권한 요청
+        webcam = new tmImage.Webcam(200, 200, true); // flip
+        await webcam.setup();
         await webcam.play();
         window.requestAnimationFrame(loop);
 
-        // 화면에 추가
         document.getElementById("webcam-container").appendChild(webcam.canvas);
         labelContainer = document.getElementById("label-container");
         for (let i = 0; i < maxPredictions; i++) {
           labelContainer.appendChild(document.createElement("div"));
         }
-      } catch (error) {
-        console.error("초기화 오류:", error);
-        alert("웹캠 또는 모델 불러오기에 실패했습니다.\n\nHTTPS 환경 또는 권한 허용 상태를 확인해주세요.");
+      } catch (err) {
+        console.error("초기화 오류:", err);
+        alert("웹캠 또는 모델 로딩 실패! 콘솔에서 오류를 확인하세요.");
       }
     }
 
@@ -55,7 +52,8 @@
     async function predict() {
       const prediction = await model.predict(webcam.canvas);
       for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction = `${prediction[i].className}: ${prediction[i].probability.toFixed(2)}`;
+        const classPrediction =
+          prediction[i].className + ": " + prediction[i].probability.toFixed(2);
         labelContainer.childNodes[i].innerHTML = classPrediction;
       }
     }
